@@ -4,6 +4,7 @@ import scala.io.Source
 import scala.util.Using
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+import java.net.{URL, HttpURLConnection}
 
 object FileIO {
   // Pure function to read subscriptions from a JSON file
@@ -32,9 +33,10 @@ object FileIO {
     tryResult.getOrElse(List.empty)
   }
 
-  // Dejamos esto temporalmente igual hasta llegar al Ejercicio 4
-  def downloadFeed(urlOrPath: String): String = {
-    val source = Source.fromURL(urlOrPath)
-    source.mkString
+ // Ahora usamos la ruta local (Mock) en lugar de conectarnos a internet
+  def downloadFeed(path: String): String = {
+    Using(Source.fromFile(path)) { source =>
+      source.mkString
+    }.getOrElse(throw new RuntimeException(s"¡Ups! No se encontró el archivo local: $path"))
   }
 }
