@@ -26,6 +26,7 @@ object Main {
     println(s"Total posts válidos (filtrados): ${validPosts.length}")
     // imprimo post para ver como se ve
     println("\nPrimer post válido:")
-    validPosts.headOption.foreach(println)
+    // En lugar de println(post), usa tu nuevo formateador:
+    validPosts.headOption.foreach(post => println(Formatters.formatPost(post)))
   }
 }
