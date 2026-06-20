@@ -11,9 +11,21 @@ object Main {
       val jsonStr = FileIO.downloadFeed(url)
       TextProcessing.parsePost(name, jsonStr)
     }
-  // para cpmprobar imprimo la cantidad total de posts
-    println(s"Total posts fetched: ${allPosts.length}")
+
+    val validPosts: List[Post] = allPosts.filter { post =>
+    // desarmamos la tupla para acceder a cada campo facil
+    val (subreddit, title, selftext, date) = post
+    // valido que el titulo y el texto tengan contenido real (no solo espacios)
+    val isTitleValid = title.trim.nonEmpty
+    val isSelfTextValid = selftext.trim.nonEmpty
+    // el post es valido si ambos campos son validos
+    isTitleValid && isSelfTextValid
+    }
+  // para cpmprobar imprimo la cantidad total de posts antes y despues del filtro
+    println(s"\nTotal posts originales: ${allPosts.length}")
+    println(s"Total posts válidos (filtrados): ${validPosts.length}")
     // imprimo post para ver como se ve
-    allPosts.headOption.foreach(println)
+    println("\nPrimer post válido:")
+    validPosts.headOption.foreach(println)
   }
 }
