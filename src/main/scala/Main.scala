@@ -8,9 +8,17 @@ object Main {
   //desarmamos la tupla de cada suscripción usando map y descargamos los posts usando FileIO.downloadFeed
    val allPosts: List[Post] = subscriptions.flatMap { case (name, url) =>
       println(s"Fetching posts from: $name ($url)")
-      val jsonStr = FileIO.downloadFeed(url)
-      TextProcessing.parsePost(name, jsonStr)
+      val jsonStringOption = FileIO.downloadFeed(url)
+      jsonStringOption match {
+        case Some(jsonString) =>
+          // parseamos el jsonString a una lista de posts usando TextProcessing.parsePost
+          TextProcessing.parsePost(name, jsonString)
+        case None =>
+          println(s"Failed to download feed from: $name ($url)")
+          List.empty[Post]
+      }
     }
+  // ahora tenemos una lista de posts, pero algunos pueden tener campos vacíos o solo espacios
 
     val validPosts: List[Post] = allPosts.filter { post =>
     // desarmamos la tupla para acceder a cada campo facil

@@ -34,9 +34,9 @@ object FileIO {
   }
 
  // Ahora usamos la ruta local (Mock) en lugar de conectarnos a internet
-  def downloadFeed(path: String): String = {
+  def downloadFeed(path: String): Option[String] = {
     Using(Source.fromFile(path)) { source =>
       source.mkString
-    }.getOrElse(throw new RuntimeException(s"¡Ups! No se encontró el archivo local: $path"))
+    }.toOption 
   }
 }
