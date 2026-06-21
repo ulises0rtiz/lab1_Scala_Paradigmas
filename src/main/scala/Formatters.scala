@@ -8,11 +8,13 @@ object Formatters {
     header + "\n" + formattedPosts
   } 
   def formatPost(post: Domain.Post): String = {
-    val (subreddit, title, selftext, date) = post
+    val (subreddit, title, selftext, date, score, permalink) = post
     s"""
     |================================================================================
     | SUBREDDIT: $subreddit
     | FECHA:     $date
+    | SCORE:     $score
+    | LINK:      $permalink
     | TÍTULO:    $title
     |--------------------------------------------------------------------------------
     | TEXTO:     $selftext

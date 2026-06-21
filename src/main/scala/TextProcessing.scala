@@ -57,8 +57,12 @@ object TextProcessing {
                         val selfText = (data \ "selftext").extract[String]
                         val createdUtc = (data \ "created_utc").extract[Double].toLong
                         val formattedDate = formatDateFromUTC(createdUtc)
+                        //  Extraemos los campos extra ejercicio 6
+                        val score = (data \ "score").extract[Int]
+                        val permalink = "https://www.reddit.com" + (data \ "permalink").extract[String]
+      
+                        (subredditName, title, selfText, formattedDate, score, permalink)
                         
-                        (subredditName, title, selfText, formattedDate)
                     }.toOption
                 }
                 
@@ -68,26 +72,29 @@ object TextProcessing {
         }
     }
     def computeWordFrequencies(post: List[Post]): Map[String, List[(String, Int)]] = {
-        // agrupo los post por nombre del subreddit 
         val groupedBySubreddit = post.groupBy(post => post._1)
-        // transformo los post de cada grupo en conteo de palabras
+        
         groupedBySubreddit.map { case (subredditName, subredditPosts) =>
-            // extraigo y separo palabras de titulos y cuerpos
-            val allWords = subredditPosts.flatMap { case (_, title, selftext, _) =>
+            // AQUI ESTÁ EL CAMBIO: Usamos post._2 y post._3 para no depender del tamaño de la tupla
+            val allWords = subredditPosts.flatMap { post =>
+                val title = post._2
+                val selftext = post._3
                 val fullText = title + " " + selftext
-                    //expresion regular que separa por cualquier caracter que no sea letra o numero
-                    fullText.split("\\W+").filter(_.nonEmpty)
-                }
+                fullText.split("\\W+").filter(_.nonEmpty)
+            }
+            
             val filteredWords = allWords.filter { word =>
                 val startsWithCapital = word.headOption.exists(_.isUpper)
                 val isNotStopword = !stopwords.contains(word.toLowerCase)
                 startsWithCapital && isNotStopword
             }    
+            
             val frequencies = filteredWords.groupBy(identity).map { case (word, occurrences) =>
                 (word, occurrences.size)
             }.toList
+            
             val sortedFrequencies = frequencies.sortBy(pair => -pair._2)
             (subredditName, sortedFrequencies)
-            }
+        }
     }
 }

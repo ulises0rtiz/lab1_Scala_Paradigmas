@@ -21,28 +21,51 @@ object Main {
   // ahora tenemos una lista de posts, pero algunos pueden tener campos vacíos o solo espacios
 
     val validPosts: List[Post] = allPosts.filter { post =>
-    // desarmamos la tupla para acceder a cada campo facil
-    val (subreddit, title, selftext, date) = post
-    // valido que el titulo y el texto tengan contenido real (no solo espacios)
-    val isTitleValid = title.trim.nonEmpty
-    val isSelfTextValid = selftext.trim.nonEmpty
-    // el post es valido si ambos campos son validos
-    isTitleValid && isSelfTextValid
+      val title = post._2
+      val selftext = post._3
+      // un post es válido si el título y el cuerpo no están vacíos o solo espacios
+      val isTitleValid = title.trim.nonEmpty
+      val isSelftextValid = selftext.trim.nonEmpty
+      isTitleValid && isSelftextValid
     }
-  // para cpmprobar imprimo la cantidad total de posts antes y despues del filtro
-    println(s"\nTotal posts originales: ${allPosts.length}")
+  println(s"\nTotal posts originales: ${allPosts.length}")
     println(s"Total posts válidos (filtrados): ${validPosts.length}")
-    // ejercicio 5: ejecucion de conteo
+
+    // Calculamos las frecuencias (ejercicio 5)
     val frequenciesPerSubreddit = TextProcessing.computeWordFrequencies(validPosts)
-    // imprimo las frecuencias por subreddit
-    println(s"\nFrecuencias de palabras por Subreddit:\n${"=" * 40}")
-    frequenciesPerSubreddit.foreach { case (subreddit, wordCounts) =>
-      println(s"\nSubreddit: r/$subreddit")
-      println("-" * 30)
-      //tomamos el top 10 
-      wordCounts.take(10).foreach { case (word, count) =>
-        println(f"$word: $count")
+    
+    // agrupamos los posts válidos por subreddit para el informe final
+    val postsBySubreddit = validPosts.groupBy(post => post._1)
+
+    // ejercicio 6 el informe final
+    println(s"\n\n# INFORME FINAL DE REDDIT\n")
+
+    postsBySubreddit.foreach { case (subreddit, posts) =>
+      
+      // FOLDLEFT: sumo los scores de forma inmutable para este subreddit
+      val totalScore = posts.foldLeft(0) { (acumulador, post) =>
+        acumulador + post._5 // El score está en la posición 5
       }
+
+      println(s"## Subreddit: r/$subreddit")
+      println(s"**Suma total de scores:** $totalScore\n")
+
+      println("### Palabras más frecuentes:")
+      val wordCounts = frequenciesPerSubreddit.getOrElse(subreddit, List.empty)
+      wordCounts.take(5).foreach { case (word, count) =>
+        println(s"- $word: $count")
+      }
+
+      println("\n### Top 5 Posts:")
+      posts.take(5).foreach { post =>
+        val title = post._2
+        val date = post._4
+        val url = post._6
+        println(s"* [$date] $title")
+        println(s"  Link: $url")
+      }
+      println("\n" + "-" * 50 + "\n")
     }
   }
 }
+
