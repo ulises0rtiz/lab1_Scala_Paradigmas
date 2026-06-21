@@ -32,9 +32,17 @@ object Main {
   // para cpmprobar imprimo la cantidad total de posts antes y despues del filtro
     println(s"\nTotal posts originales: ${allPosts.length}")
     println(s"Total posts válidos (filtrados): ${validPosts.length}")
-    // imprimo post para ver como se ve
-    println("\nPrimer post válido:")
-    // En lugar de println(post), usa tu nuevo formateador:
-    validPosts.headOption.foreach(post => println(Formatters.formatPost(post)))
+    // ejercicio 5: ejecucion de conteo
+    val frequenciesPerSubreddit = TextProcessing.computeWordFrequencies(validPosts)
+    // imprimo las frecuencias por subreddit
+    println(s"\nFrecuencias de palabras por Subreddit:\n${"=" * 40}")
+    frequenciesPerSubreddit.foreach { case (subreddit, wordCounts) =>
+      println(s"\nSubreddit: r/$subreddit")
+      println("-" * 30)
+      //tomamos el top 10 
+      wordCounts.take(10).foreach { case (word, count) =>
+        println(f"$word: $count")
+      }
+    }
   }
 }
